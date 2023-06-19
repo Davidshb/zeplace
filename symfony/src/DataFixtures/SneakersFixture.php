@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\DataFixtures\Traits\FixtureGroupTrait;
 use App\Entity\Brand;
 use App\Entity\Sneaker;
 use App\Enum\FixturesGroupType;
@@ -15,7 +16,7 @@ class SneakersFixture extends Fixture implements FixtureGroupInterface, Dependen
 {
     use FixtureGroupTrait;
 
-    private const group = [
+    private const GROUP = [
         FixturesGroupType::DEV
     ];
 
@@ -29,9 +30,9 @@ class SneakersFixture extends Fixture implements FixtureGroupInterface, Dependen
         ];
     }
 
-    const AF1 = 'af1';
+    public const AF1 = 'af1';
 
-    const SLIDE = 'slide';
+    public const SLIDE = 'slide';
 
     public function load(ObjectManager $manager): void
     {
@@ -77,17 +78,16 @@ La Nike Air Force 1 Low White ‘07 est sortie pour la première fois en 2007, m
     }
 
     private function createSneaker(
-        Brand             $brand,
-        string            $sku,
-        string            $name,
-        string            $colorisName,
-        string            $coloris,
-        string            $description,
-        int               $retailPrice,
-        string            $stockXLink,
+        Brand $brand,
+        string $sku,
+        string $name,
+        string $colorisName,
+        string $coloris,
+        string $description,
+        int $retailPrice,
+        string $stockXLink,
         DateTimeImmutable $dropDate
-    ): Sneaker
-    {
+    ): Sneaker {
         $sneaker = new Sneaker();
         $sneaker
             ->setBrand($brand)

@@ -1,0 +1,19 @@
+nelmio_api_doc:
+    documentation:
+        servers:
+            - url: http://localhost
+        info:
+            title: Zeplace
+            description: documentation de l'api
+            version: 1.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        security:
+            - Bearer: []
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc|/doc.json$) # Accepts routes under /api except /api/doc

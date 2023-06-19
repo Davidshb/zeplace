@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\DataFixtures\Traits\FixtureGroupTrait;
 use App\Entity\Sneaker;
 use App\Entity\User;
 use App\Entity\UserSneaker;
@@ -17,7 +18,7 @@ class UserSneakersFixture extends Fixture implements FixtureGroupInterface, Depe
 {
     use FixtureGroupTrait;
 
-    private const group = [
+    private const GROUP = [
         FixturesGroupType::DEV
     ];
 

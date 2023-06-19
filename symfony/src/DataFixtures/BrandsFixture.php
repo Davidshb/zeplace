@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\DataFixtures\Traits\FixtureGroupTrait;
 use App\Entity\Brand;
 use App\Enum\FixturesGroupType;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -12,12 +13,12 @@ class BrandsFixture extends Fixture implements FixtureGroupInterface
 {
     use FixtureGroupTrait;
 
-    private const group = [
+    private const GROUP = [
         FixturesGroupType::DEV
     ];
 
-    const NIKE = 'nike';
-    const ADIDAS = 'adidas';
+    public const NIKE = 'nike';
+    public const ADIDAS = 'adidas';
 
     public function load(ObjectManager $manager): void
     {

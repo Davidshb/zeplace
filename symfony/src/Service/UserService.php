@@ -1,27 +1,20 @@
 <?php
 
 namespace App\Service;
-use App\Dto\Output\UserProfileDTO;
+
+use App\Dto\Input\LoginDTO;
 use App\Entity\User;
+use App\Repository\UserRepository;
 
 readonly class UserService
 {
-
-    public function __construct(private UserSneakerService $sneakerService)
-    {
+    public function __construct(
+        private UserRepository $userRepository
+    ) {
     }
 
-    /**
-     * @param User $user
-     * @return UserProfileDTO
-     */
-    public function computeUserProfile(User $user): UserProfileDTO
+    public function getUserFromLogin(LoginDTO $loginDTO): ?User
     {
-        $res = new UserProfileDTO();
-
-        $res->username = $user->getUsername();
-        $res->sneakers = $this->sneakerService->computeUserSneakerDTOs($user->getUserSneakers()->toArray());
-
-        return $res;
+        return $this->userRepository->findOneBy(['username' => $loginDTO->username]);
     }
 }

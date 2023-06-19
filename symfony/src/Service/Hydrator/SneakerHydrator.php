@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Service\Hydrator;
+
 use App\Dto\Input\SneakerDTO;
 use App\Entity\Sneaker;
 use App\Repository\BrandRepository;
@@ -9,14 +10,14 @@ use Exception;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-readonly class SneakerHydrator
+class SneakerHydrator extends AbstractHydrator
 {
     public function __construct(
-        private SerializerInterface $serializer,
-        private ValidatorInterface $validator,
-        private BrandRepository $brandRepository
+        SerializerInterface $serializer,
+        ValidatorInterface $validator,
+        private readonly BrandRepository $brandRepository
     ) {
-
+        parent::__construct($serializer, $validator);
     }
 
     public function hydrateSneakerDTO(string $json): ?SneakerDTO
@@ -27,7 +28,7 @@ readonly class SneakerHydrator
             return null;
         }
 
-        if($this->validator->validate($sneakerDTO)->count() > 0) {
+        if ($this->validator->validate($sneakerDTO)->count() > 0) {
             return null;
         }
 

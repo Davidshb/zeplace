@@ -8,6 +8,10 @@ up:
 down:
 	docker compose down
 
+.PHONY: ps
+ps:
+	docker compose ps
+
 .PHONY: composer
 composer:
 	docker compose exec web composer $(filter-out $@,$(MAKECMDGOALS))
@@ -46,14 +50,16 @@ migrate-prev:
 load-fixtures:
 	docker compose exec web php bin/console doctrine:fixtures:load --purger=truncate_purger --group=dev
 
-.PHONY: assets-dev
-assets-dev:
-	docker compose exec node yarn encore dev
-
-.PHONY: assets-watch
-assets-watch:
-	docker compose exec node yarn run dev-server
+.PHONY: ng
+ng:
+	docker compose exec node ng $(filter-out $@,$(MAKECMDGOALS))
 
 .PHONY: yarn
 yarn:
 	docker compose exec node yarn $(filter-out $@,$(MAKECMDGOALS))
+
+# install java in the docker image
+.PHONY: generate-api
+generate-api:
+	docker compose exec web php bin/console nelmio:apidoc:dump --format=json | docker compose exec -T node tee api.json > /dev/null
+	docker compose exec node openapi-generator-cli generate -g typescript-angular -i api.json -o src/app/core/api --additional-properties=usePromises=true

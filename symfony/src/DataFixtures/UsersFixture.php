@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\DataFixtures\Traits\FixtureGroupTrait;
 use App\Entity\User;
 use App\Enum\FixturesGroupType;
 use App\Repository\UserRepository;
@@ -14,7 +15,7 @@ class UsersFixture extends Fixture implements FixtureGroupInterface
 {
     use FixtureGroupTrait;
 
-    private const group = [
+    private const GROUP = [
         FixturesGroupType::DEV
     ];
 
@@ -22,8 +23,7 @@ class UsersFixture extends Fixture implements FixtureGroupInterface
 
     public function __construct(
         private readonly UserPasswordHasherInterface $userPasswordHasher
-    )
-    {
+    ) {
     }
 
     public function load(ObjectManager $manager): void
@@ -36,9 +36,8 @@ class UsersFixture extends Fixture implements FixtureGroupInterface
         if ($user === null) {
             $user = $this->createUser(
                 'davidshbo',
-                '123456',
-                'tonydavidseh@hotmail.fr',
-                true
+                '12345678',
+                'tonydavidseh@hotmail.fr'
             );
             $manager->persist($user);
         }
@@ -63,14 +62,11 @@ class UsersFixture extends Fixture implements FixtureGroupInterface
         string $username,
         string $plainPassword,
         string $email,
-        bool   $isVerified = false
-    ): User
-    {
+    ): User {
         $user = new User();
         $user->setUsername($username)
             ->setEmail($email)
-            ->setPassword($this->userPasswordHasher->hashPassword($user, $plainPassword))
-            ->setIsVerified($isVerified);
+            ->setPassword($this->userPasswordHasher->hashPassword($user, $plainPassword));
 
         return $user;
     }

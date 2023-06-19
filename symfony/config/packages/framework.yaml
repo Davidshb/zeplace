@@ -8,8 +8,9 @@ framework:
     # Enables session support. Note that the session will ONLY be started if you read or write from it.
     # Remove or comment this section to explicitly disable session support.
     session:
-        handler_id: null
-        cookie_secure: auto
+        handler_id: 'redis://%env(resolve:REDIS_USER)%:%env(resolve:REDIS_PASSWORD)%@%env(resolve:REDIS_HOST)%:%env(resolve:REDIS_PORT)%'
+        cookie_secure: true
+        cookie_httponly: true
         cookie_samesite: lax
         storage_factory_id: session.storage.factory.native
 

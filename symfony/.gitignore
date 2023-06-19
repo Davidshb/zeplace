@@ -344,3 +344,7 @@ yarn-error.log
 # .pnp.*
 
 # End of https://www.toptal.com/developers/gitignore/api/symfony,phpstorm,yarn,node,vuejs,composer
+###> squizlabs/php_codesniffer ###
+/.phpcs-cache
+/phpcs.xml
+###< squizlabs/php_codesniffer ###
