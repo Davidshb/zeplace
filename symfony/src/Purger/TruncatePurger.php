@@ -8,17 +8,15 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class TruncatePurger implements ORMPurgerInterface
 {
-
     private const IGNORED = [
-        'user'
+        'user',
+        'user_token'
     ];
 
-    public function __construct(EntityManagerInterface $em)
-    {
-        $this->em = $em;
+    public function __construct(
+        private EntityManagerInterface $em
+    ) {
     }
-
-    private EntityManagerInterface $em;
 
     /**
      * @inheritDoc
@@ -39,7 +37,7 @@ class TruncatePurger implements ORMPurgerInterface
         $tables = $connection->createSchemaManager()->listTableNames();
 
         foreach ($tables as $table) {
-            if(!str_contains($table, 'doctrine') && !in_array($table, self::IGNORED)) {
+            if (!str_contains($table, 'doctrine') && !in_array($table, self::IGNORED)) {
                 $platform = $connection->getDatabasePlatform();
 
                 $connection->beginTransaction();
@@ -49,7 +47,6 @@ class TruncatePurger implements ORMPurgerInterface
                 $connection->executeQuery($platform->getTruncateTableSQL($table, true));
 
                 $connection->executeQuery('SET FOREIGN_KEY_CHECKS=1;');
-
             }
         }
     }

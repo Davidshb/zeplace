@@ -24,7 +24,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 50, unique: true)]
     private string $username;
 
-    #[ORM\Column(unique: true)]
+    #[ORM\Column(length: 255, unique: true)]
     private string $email;
 
     #[ORM\Column(type: Types::JSON)]
@@ -117,6 +117,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         if ($key !== false) {
             unset($this->roles[$key]);
+            $this->roles = array_values($this->roles);
         }
 
         return $this;
@@ -125,7 +126,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 
@@ -141,7 +142,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->userSneakers->contains($userSneaker)) {
             $this->userSneakers->add($userSneaker);
-            $userSneaker->setUser($this);
         }
 
         return $this;
@@ -149,12 +149,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeUserSneaker(UserSneaker $userSneaker): self
     {
-        if ($this->userSneakers->removeElement($userSneaker)) {
-            // set the owning side to null (unless already changed)
-            if ($userSneaker->getUser() === $this) {
-                $userSneaker->setUser(null);
-            }
-        }
+        $this->userSneakers->removeElement($userSneaker);
 
         return $this;
     }

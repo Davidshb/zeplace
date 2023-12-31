@@ -1,0 +1,29 @@
+<div class="card">
+  <img class="card-img-top shoe-img" referrerpolicy="origin" width="100" height="140"
+       [ngSrc]="shoe.imgUrl"
+       [alt]="shoe.name"/>
+  <div class="card-body">
+    <h5 class="card-title shoe-name">{{shoe.name}}</h5>
+    <h6 class="card-subtitle mb-3">Vendu le {{shoe.soldDate}}</h6>
+    <div class="card-text d-flex align-items-center">
+      <span class="fs-2 fw-bold">{{shoe.soldPrice}}</span>
+      <span [class]="{'text-success': shoe.profitVal > 0, 'text-danger': shoe.profitVal < 0}">({{shoe.profit}})</span>
+    </div>
+    <div>{{shoe.size}}</div>
+    <hr/>
+    <div class="d-flex justify-content-around">
+      <button [disabled]="_shoesService.isRequesting() | async" [routerLink]="['/sneaker', this.shoe.id, 'edit']"
+              class="btn btn-primary">
+        Editer
+      </button>
+      <button [disabled]="isDeleting$ | async" (click)="deleteShoe()" class="btn btn-danger btn-delete">
+        <ng-container *ngIf="isDeleting$ | async">
+          <app-spinner/>
+        </ng-container>
+        <ng-container *ngIf="!(isDeleting$ | async)">
+          Supprimer
+        </ng-container>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+<h2>Vente #{{shoeDetails.id}} : <strong>{{shoeDetails.title}}</strong></h2>
+<div class="header-img">
+    <img [src]="shoeDetails.imgUrl" [alt]="shoeDetails.title"/>
+</div>
+<hr/>
+<form class="col-md-6 offset-md-3" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="mb-3">
+        <label for="purchase-date" class="form-label">Date d'achat</label>
+        <input [class.is-invalid]="form.get('purchaseDate')?.invalid && (form.get('purchaseDate')?.dirty || form.get('purchaseDate')?.touched)"
+               id="purchase-date" type="date" class="form-control" formControlName="purchaseDate">
+    </div>
+    <div class="mb-3">
+        <label for="selling-date" class="form-label">Date de vente</label>
+        <input id="selling-date" type="date" class="form-control" formControlName="sellingDate"
+               [class.is-invalid]="form.get('sellingDate')?.invalid && (form.get('sellingDate')?.dirty || form.get('sellingDate')?.touched)"
+        >
+    </div>
+    <div class="mb-3 row">
+        <div class="col-md-6">
+            <label for="purchase-price" class="form-label">Prix d'achat</label>
+            <app-price-form
+                    [isInvalid]="!!(form.get('purchasePrice')?.invalid && (form.get('purchasePrice')?.dirty || form.get('purchasePrice')?.touched))"
+                    formControlName="purchasePrice" id="purchase-price"/>
+        </div>
+        <div class="col-md-6">
+            <label for="shipping-cost" class="form-label">Coût de livraison</label>
+            <app-price-form
+                    [isInvalid]="!!(form.get('shippingCost')?.invalid && (form.get('shippingCost')?.dirty || form.get('shippingCost')?.touched))"
+                    formControlName="shippingCost" id="shipping-cost"/>
+        </div>
+    </div>
+    <div class=" mb-3 row">
+        <div class="col-md-6">
+            <label for="selling-price" class="form-label">Prix de vente</label>
+            <app-price-form
+                    [isInvalid]="!!(form.get('sellingPrice')?.invalid && (form.get('sellingPrice')?.dirty || form.get('sellingPrice')?.touched))"
+                    formControlName="sellingPrice" id="selling-price"/>
+        </div>
+        <div class="col-md-6">
+            <label for="size" class="form-label">Taille</label>
+            <select class="form-select" id="size" formControlName="size"
+                    [class.is-invalid]="form.get('size')?.invalid && (form.get('size')?.dirty || form.get('size')?.touched)">
+                <option *ngFor="let size of sizes" [ngValue]="size">{{size}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="comment" class="form-label">Commentaire (ce commentaire est privé)</label>
+        <textarea rows="4" id="comment" class="form-control" formControlName="comment"></textarea>
+    </div>
+
+    <div *ngIf="changed" class="py-2 bg-dark d-flex align-items-center justify-content-evenly fixed-bottom">
+        <button (click)="cancel()" type="button" class="btn btn-danger btn-lg">Annuler</button>
+        <button type="submit" class="btn btn-success btn-lg">Valider</button>
+    </div>
+</form>
+

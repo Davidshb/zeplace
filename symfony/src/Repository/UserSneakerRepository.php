@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\UserSneaker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -21,46 +22,39 @@ class UserSneakerRepository extends ServiceEntityRepository
         parent::__construct($registry, UserSneaker::class);
     }
 
-    public function save(UserSneaker $entity, bool $flush = false): void
+    /**
+     * @param User $user
+     * @return array<UserSneaker>
+     */
+    public function findSoldByUser(User $user): array
     {
-        $this->getEntityManager()->persist($entity);
+        $qb = $this->createQueryBuilder('us')
+            ->addSelect('s')
+            ->join('us.sneaker', 's')
+            ->where('us.user = :user')
+            ->andWhere('us.sellingDate IS NOT NULL')
+            ->orderBy('us.updatedAt', 'DESC');
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        $qb->setParameter('user', $user);
+
+        return $qb->getQuery()->getResult();
     }
 
-    public function remove(UserSneaker $entity, bool $flush = false): void
+    /**
+     * @param User $user
+     * @return array<UserSneaker>
+     */
+    public function findSaleByUser(User $user): array
     {
-        $this->getEntityManager()->remove($entity);
+        $qb = $this->createQueryBuilder('us')
+            ->addSelect('s')
+            ->innerJoin('us.sneaker', 's')
+            ->where('us.sellingDate IS NULL')
+            ->andWhere('us.user = :user')
+            ->orderBy('us.updatedAt', 'DESC');
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        $qb->setParameter('user', $user);
+
+        return $qb->getQuery()->getResult();
     }
-
-//    /**
-//     * @return UserSneaker[] Returns an array of UserSneaker objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?UserSneaker
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

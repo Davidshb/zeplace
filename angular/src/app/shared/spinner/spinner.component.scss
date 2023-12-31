@@ -1,10 +1,11 @@
-.loader {
-  width: 100%;
-  height: 100%;
-  border: var(--spinner-width, 10px) solid var(--spinner-color, teal);
+:host {
+  border: var(--spinner-border, 10px) solid var(--spinner-color, teal);
   border-bottom-color: transparent;
   border-radius: 50%;
   animation: rotation 1s linear infinite;
+  width: var(--spinner-width, 100%);
+  height: var(--spinner-width, 100%);
+  display: block;
 }
 
 @keyframes rotation {

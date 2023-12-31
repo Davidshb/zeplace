@@ -1,15 +1,16 @@
 <?php
 
 namespace App\Security;
+
+use SensitiveParameter;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class TokenHasher implements PasswordHasherInterface
 {
-
     /**
      * @inheritDoc
      */
-    public function hash(#[\SensitiveParameter] string $plainPassword): string
+    public function hash(#[SensitiveParameter] string $plainPassword): string
     {
         return hash('sha256', $plainPassword);
     }
@@ -17,7 +18,7 @@ class TokenHasher implements PasswordHasherInterface
     /**
      * @inheritDoc
      */
-    public function verify(string $hashedPassword, #[\SensitiveParameter] string $plainPassword): bool
+    public function verify(string $hashedPassword, #[SensitiveParameter] string $plainPassword): bool
     {
         return $this->hash($plainPassword) == $hashedPassword;
     }

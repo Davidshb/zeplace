@@ -4,11 +4,13 @@ namespace App\Security;
 
 use App\Enum\ApiErrorCode;
 use App\Repository\UserTokenRepository;
+use App\Service\Helper\SerializerService;
 use App\Service\Login\JwtService;
 use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
@@ -20,14 +22,17 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 class ApiKeyAuthenticator extends AbstractAuthenticator
 {
     /**
-     * @param JwtService          $jwtService
-     * @param TokenHasher         $hasher
+     * @param JwtService $jwtService
+     * @param TokenHasher $hasher
      * @param UserTokenRepository $userTokenRepository
+     * @param SerializerService $serializerService
      */
     public function __construct(
         private readonly JwtService $jwtService,
         private readonly TokenHasher $hasher,
-        private readonly UserTokenRepository $userTokenRepository
+        private readonly UserTokenRepository $userTokenRepository,
+        private readonly SerializerService $serializerService,
+        UserPasswordHasherInterface $userPasswordHasher
     ) {
     }
 
@@ -37,39 +42,40 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
      */
     public function supports(Request $request): ?bool
     {
-        return $request->headers->has('Authorization')
-            && !empty($request->headers->get('Authorization'))
-            && !str_starts_with($request->getRequestUri(), '/api');
+        return $request->headers->has('Authorization') && !empty(
+            $request->headers->get(
+                'Authorization'
+            )
+        ) && !str_starts_with($request->getRequestUri(), '/api/login');
     }
 
-
     /**
-     * @param  Request $request
+     * @param Request $request
      * @return Passport
      * @throws NonUniqueResultException
      */
     public function authenticate(Request $request): Passport
     {
-        $jwt = $this->jwtService->extractTokenFromHeader(
-            $request->headers->get('Authorization')
-        );
+        $header = $request->headers->get('Authorization');
 
-        $hashedToken = $this->hasher->hash($jwt);
-        $token       = $this->userTokenRepository->findOneValid($hashedToken);
+        if ($header !== null) {
+            $jwt = $this->jwtService->extractTokenFromHeader($header);
+            $hashedToken = $this->hasher->hash($jwt);
+            $token = $this->userTokenRepository->findOneValid($hashedToken);
 
-        if ($token === null) {
-            throw new CustomUserMessageAuthenticationException(
-                'Unauthorized',
-                [
-                    'errorCode' => ApiErrorCode::GENERIC_UNAUTHORIZED,
-                    'httpCode'  => Response::HTTP_UNAUTHORIZED,
-                ]
-            );
+            if ($token !== null) {
+                return new SelfValidatingPassport(new UserBadge($token->getUser()->getUserIdentifier()), []);
+            }
         }
 
-        return new SelfValidatingPassport(new UserBadge($token->getUser()->getUserIdentifier()), []);
+        throw new CustomUserMessageAuthenticationException(
+            'accès non autorisé',
+            [
+                'errorCode' => ApiErrorCode::GENERIC_UNAUTHORIZED,
+                'httpCode' => Response::HTTP_UNAUTHORIZED,
+            ]
+        );
     }
-
 
     /**
      * @inheritDoc
@@ -79,18 +85,15 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
         return null;
     }
 
-
     /**
      * @inheritDoc
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        $error = new APIError();
-        $error->setErrorCode($exception->getMessageData()['errorCode']);
-        $error->setErrorMessage($exception->getMessage());
+        $error = new APIError($exception->getMessageData()['errorCode'], $exception->getMessage());
 
-        $httpCode = ($exception->getMessageData()['httpCode'] ?? Response::HTTP_BAD_REQUEST);
+        $httpCode = $exception->getMessageData()['httpCode'] ?? Response::HTTP_BAD_REQUEST;
 
-        return new JsonResponse($error, status: $httpCode, json: false);
+        return new JsonResponse($this->serializerService->toJSON($error), status: $httpCode, json: true);
     }
 }

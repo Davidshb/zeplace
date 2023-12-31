@@ -1,0 +1,5 @@
+{
+  name: "angular",
+  dockerComposeFile: '../docker-compose.yml',
+  service: "node"
+}

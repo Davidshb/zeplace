@@ -1,0 +1,26 @@
+<div class="card">
+  <img class="card-img-top shoe-img" referrerpolicy="origin" width="280" height="200"
+       [ngSrc]="shoe.imgUrl"
+       [alt]="shoe.name"/>
+  <div class="card-body">
+    <h5 class="card-title shoe-name">{{shoe.name}}</h5>
+    <h6 class="card-subtitle mb-3">Mise en vente le {{shoe.purchaseDate}}</h6>
+    <div class="fs-2 fw-bold">{{shoe.sellingPrice}}</div>
+    <div>{{shoe.size}}</div>
+    <hr/>
+    <div class="d-flex justify-content-around">
+      <button [disabled]="_shoesService.isRequesting() | async" [routerLink]="['/sneaker', this.shoe.id, 'edit']"
+              class="btn btn-primary">
+        Editer
+      </button>
+      <button [disabled]="isDeleting" (click)="deleteShoe()" class="btn btn-danger btn-delete">
+        <ng-container *ngIf="isDeleting">
+          <app-spinner/>
+        </ng-container>
+        <ng-container *ngIf="!(isDeleting)">
+          Supprimer
+        </ng-container>
+      </button>
+    </div>
+  </div>
+</div>

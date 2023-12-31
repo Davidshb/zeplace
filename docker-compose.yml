@@ -1,15 +1,15 @@
 version: '3.4'
 
 services:
-  web:
+  api:
     build:
       dockerfile: ./docker/dev/php/Dockerfile
     depends_on:
       - database
       - redis
     volumes:
-      - ".composer:/tmp/.composer"
       - "./symfony:/var/www/html"
+      - "~/.gitconfig:/etc/gitconfig"
     environment:
       - APACHE_SERVER_NAME=localhost
     extra_hosts:
@@ -18,7 +18,7 @@ services:
       - "80:80"
 
   database:
-    image: mariadb
+    image: mariadb:10.10.2
     volumes:
       - db_data:/var/lib/mysql
     environment:
@@ -26,6 +26,7 @@ services:
       MYSQL_DATABASE: ${DATABASE_NAME}
       MYSQL_PASSWORD: ${DATABASE_PASSWORD}
       MYSQL_USER: ${DATABASE_USER}
+      MARIADB_AUTO_UPGRADE: true
     ports:
       - "${DATABASE_PORT}:${DATABASE_PORT}"
 
@@ -35,6 +36,7 @@ services:
     volumes:
       - './angular:/usr/app'
     restart: unless-stopped
+    working_dir: "/usr/app"
     extra_hosts:
       - host.docker.internal:host-gateway
     ports:

@@ -34,9 +34,7 @@ class AbstractApiController extends AbstractController
         ApiErrorCode $code = ApiErrorCode::GENERIC_NOT_FOUND,
         string $message = "la resource n'a pas été trouvée"
     ): JsonResponse {
-        $apiError = new APIError();
-        $apiError->setErrorCode($code);
-        $apiError->setErrorMessage($message);
+        $apiError = new APIError($code, $message);
 
         return $this->getError([$apiError], Response::HTTP_NOT_FOUND);
     }
@@ -45,9 +43,21 @@ class AbstractApiController extends AbstractController
         ApiErrorCode $code = ApiErrorCode::GENERIC_BAD_REQUEST,
         string $message = 'Bad request'
     ): JsonResponse {
-        $apiError = new APIError();
-        $apiError->setErrorMessage($message);
-        $apiError->setErrorCode($code);
+        $apiError = new APIError($code, $message);
         return $this->getError([$apiError], Response::HTTP_BAD_REQUEST);
+    }
+
+    public function getServerError(
+        ApiErrorCode $code = ApiErrorCode::GENERIC_SERVER_ERROR,
+        string $message = 'Erreur serveur'
+    ): JsonResponse {
+        $apiError = new APIError($code, $message);
+
+        return $this->getError([$apiError], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    public function getOk(bool $res = true): JsonResponse
+    {
+        return new JsonResponse(['response' => $res]);
     }
 }

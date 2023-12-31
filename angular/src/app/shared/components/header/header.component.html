@@ -1,0 +1,21 @@
+<nav data-bs-theme="dark" class="navbar bg-dark mb-2">
+  <div class="container-fluid">
+    <a routerLink="/" class="navbar-brand">Zeplace</a>
+    <div *ngIf="_authService.isLogged() | async" class="d-flex">
+      <form class="d-flex">
+        <input type="search" class="form-control me-2" placeholder="rechercher" aria-label="Rechercher">
+      </form>
+      <div class="dropdown ms-2">
+        <button class="dropdown-toggle btn btn-light" data-bs-toggle="dropdown" aria-expanded="false"></button>
+        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+          <li>
+            <button (click)="_authService.logout()" class="dropdown-item btn btn-dark">
+              <i class="bi bi-box-arrow-left"></i>
+              Déconnexion
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>

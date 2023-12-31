@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, filter, Observable} from "rxjs";
+import { BehaviorSubject } from 'rxjs';
 import {TokenService} from "@core/services/token.service";
 import {Router} from "@angular/router";
 
@@ -8,23 +8,16 @@ import {Router} from "@angular/router";
 })
 export class AuthService {
 
-  private _isLoggedSubject: BehaviorSubject<boolean | null> = new BehaviorSubject<boolean | null>(null);
-
-  private _isLoggingInSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
+  private _isLoggedSubject = new BehaviorSubject<boolean>(this._tokenService.getToken() !== null);
 
   constructor(
     private readonly _tokenService: TokenService,
     private readonly _router: Router
   ) {
-    this._isLoggedSubject.next(_tokenService.getToken() !== null)
   }
 
   public isLogged() {
-    return this._isLoggedSubject.asObservable().pipe(filter(data => data != null))
-  }
-
-  public getLoggingIn(): Observable<boolean> {
-    return this._isLoggingInSubject.asObservable()
+    return this._isLoggedSubject.asObservable()
   }
 
   public login(token: string) {
@@ -33,7 +26,8 @@ export class AuthService {
   }
 
   public logout() {
+    this._tokenService.cleanToken()
     this._isLoggedSubject.next(false)
-    this._router.navigate(['login'])
+    void this._router.navigate(['login'])
   }
 }

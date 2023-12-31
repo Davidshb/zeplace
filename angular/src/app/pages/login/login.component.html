@@ -1,56 +1,52 @@
-<div class="row">
-  <div class="col s12 m4 offset-m4">
-    <div class="card">
-      <div class="card-content center">
-        <span class="card-title">Page de Connexion</span>
-        <ul class="collection with-header red-text" *ngIf="errors.length">
-          <li class="collection-header">Erreurs</li>
-          <li class="collection-item" *ngFor="let error of errors">
-            {{error}}
-          </li>
-        </ul>
-      </div>
-      <form (ngSubmit)="login(loginForm)" #loginForm="ngForm">
-        <div class="row">
-          <div class="input-field col s12">
-            <label for="username">Nom d'utilisateur</label>
-            <input name="username" type="text"
-                   minlength="5"
-                   maxlength="50"
-                   [(ngModel)]="loginData.username"
-                   #username="ngModel"
-                   pattern="^\w{5,50}"
-                   id="username" required>
-            <small [hidden]="username.disabled || username.valid || username.pristine" class="red-text">
-              Le nom d'utilisateur doit être compris entre 5 et 50 caractères
-            </small>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <label for="password">Mot de passe</label>
-            <input name="password" type="password" class="input-field"
-                   minlength="8"
-                   [(ngModel)]="loginData.password"
-                   #password="ngModel"
-                   id="password" required>
-            <small [hidden]="password.disabled || password.valid || password.pristine" class="red-text">
-              Le mot de passe doit faire 50 caractères minimum
-            </small>
-          </div>
-        </div>
-        <div class="card-action center">
-          <button [disabled]="loginForm.invalid" type="submit" class="waves-effect waves-light btn">
-            <div [style]="{height: '20px', width: '20px'}" *ngIf="isLoggingIn$ | async">
-              <app-spinner/>
+<div class="row mt-4">
+    <div class="offset-md-4 col-12 col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title text-center">Connexion</h1>
+                <form (ngSubmit)="login(loginForm)" #loginForm="ngForm">
+                    <div class="row">
+                        <div class="mb-3">
+                            <label class="form-label" for="username">Nom d'utilisateur</label>
+                            <input name="username" type="text"
+                                   minlength="5"
+                                   maxlength="50"
+                                   [(ngModel)]="loginData.username"
+                                   #username="ngModel"
+                                   pattern="^\w{5,50}"
+                                   class="form-control"
+                                   id="username" required>
+                            <small [hidden]="username.disabled || username.valid || username.pristine"
+                                   class="form-text">
+                                Le nom d'utilisateur doit être compris entre 5 et 50 caractères
+                            </small>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3">
+                            <label class="form-label" for="password">Mot de passe</label>
+                            <input name="password" type="password" class="form-control"
+                                   minlength="8"
+                                   [(ngModel)]="loginData.password"
+                                   #password="ngModel"
+                                   id="password" required>
+                            <small [hidden]="password.disabled || password.valid || password.pristine" class="red-text">
+                                Le mot de passe doit faire 8 caractères minimum et 50 caractères maximum
+                            </small>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button [disabled]="loginForm.invalid" type="submit" class="btn btn-primary ">
+                            <div [style]="{height: '20px', width: '20px'}" *ngIf="!loginForm.control.enabled">
+                                <app-spinner/>
+                            </div>
+                            <ng-container *ngIf="loginForm.control.enabled">
+                                Connexion
+                                <i class="bi bi-send-fill"></i>
+                            </ng-container>
+                        </button>
+                    </div>
+                </form>
             </div>
-            <ng-template [ngIf]="!(isLoggingIn$ | async)">
-              Connexion
-              <i class="material-icons right">send</i>
-            </ng-template>
-          </button>
         </div>
-      </form>
     </div>
-  </div>
 </div>

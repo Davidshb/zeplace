@@ -2,86 +2,63 @@
 
 namespace App\DataFixtures;
 
-use App\DataFixtures\Traits\FixtureGroupTrait;
+use App\DataFixtures\Factory\RandomFactory;
 use App\Entity\Sneaker;
 use App\Entity\User;
 use App\Entity\UserSneaker;
-use App\Enum\FixturesGroupType;
+use App\Enum\ShoeSize;
+use DateInterval;
 use DateTime;
-use DateTimeInterface;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Exception;
 
-class UserSneakersFixture extends Fixture implements FixtureGroupInterface, DependentFixtureInterface
+class UserSneakersFixture extends Fixture implements DependentFixtureInterface
 {
-    use FixtureGroupTrait;
-
-    private const GROUP = [
-        FixturesGroupType::DEV
-    ];
-
+    /**
+     * @throws Exception
+     */
     public function load(ObjectManager $manager): void
     {
         /** @var User $user */
-        $user = $this->getReference(UsersFixture::USER);
+        $user = $this->getReference(UsersFixture::USER, User::class);
 
-        /** @var Sneaker $af1 */
-        $af1 = $this->getReference(SneakersFixture::AF1);
+        /** @var array<Sneaker> $sneakers */
+        $sneakers = $manager->getRepository(Sneaker::class)->createQueryBuilder('s')
+            ->setMaxResults(100)
+            ->getQuery()
+            ->getResult();
 
-        /** @var Sneaker $slide */
-        $slide = $this->getReference(SneakersFixture::SLIDE);
+        $today = new DateTime('today');
+        $sizeShoes = ShoeSize::cases();
+        $sizeShoesCount = count($sizeShoes) - 1;
 
-        $userSneaker = $this->createUserSneaker(
-            $user,
-            $af1,
-            12099,
-            13500,
-            new DateTime('01-01-2023'),
-            0
-        );
+        foreach ($sneakers as $sneaker) {
+            $res = new UserSneaker($user, $sneaker);
+            $diff = $today->diff($sneaker->getDropDate());
+            $diff = new DateInterval("P" . rand(0, $diff->d) . "D");
+            $retailPrice = $sneaker->getRetailPrice();
+            $res->setPurchasePrice($retailPrice)
+                ->setShippingCost(RandomFactory::getRandomFloat(0, 20))
+                ->setPurchaseDate($sneaker->getDropDate()->add($diff))
+                ->setSize($sizeShoes[rand(0, $sizeShoesCount)]);
 
-        $manager->persist($userSneaker);
+            if (rand(0, 1) === 0) {
+                $res->setSellingPrice(RandomFactory::getRandomFloat($retailPrice, $retailPrice + 50));
 
-        $userSneaker = $this->createUserSneaker(
-            $user,
-            $slide,
-            6600,
-            10000,
-            new DateTime('05-01-2023'),
-            10
-        );
+                if (rand(0, 1) === 0) {
+                    $res->setSellingDate($res->getPurchaseDate()->add(new DateInterval('P5D')))
+                        ->setComment(RandomFactory::getLoremIpsum());
+                }
+            }
 
-        $manager->persist($userSneaker);
+            $manager->persist($res);
+        }
 
         $manager->flush();
     }
 
-    private function createUserSneaker(
-        User              $user,
-        Sneaker           $sneaker,
-        int               $sellingPrice,
-        int $purchasePrice,
-        DateTimeInterface $dateTime,
-        int               $shippingCost
-    ): UserSneaker
-    {
-        $userSneaker = new UserSneaker();
-
-        $userSneaker->setUser($user)
-            ->setSneaker($sneaker)
-            ->setSellingPrice($sellingPrice)
-            ->setPurchasePrice($purchasePrice)
-            ->setPurchaseDate($dateTime)
-            ->setShippingCost($shippingCost);
-
-        return $userSneaker;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getDependencies(): array
     {
         return [

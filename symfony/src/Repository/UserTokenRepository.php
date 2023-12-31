@@ -46,4 +46,15 @@ class UserTokenRepository extends ServiceEntityRepository
 
         $qb->getQuery()->execute();
     }
+
+    public function removeToken(string $token): void
+    {
+        $qb = $this->createQueryBuilder('ut')
+            ->delete()
+            ->where('ut.token = :token');
+
+        $qb->setParameter('token', $token);
+
+        $qb->getQuery()->execute();
+    }
 }

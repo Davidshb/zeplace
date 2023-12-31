@@ -2,23 +2,14 @@
 
 namespace App\DataFixtures;
 
-use App\DataFixtures\Traits\FixtureGroupTrait;
 use App\Entity\User;
-use App\Enum\FixturesGroupType;
 use App\Repository\UserRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UsersFixture extends Fixture implements FixtureGroupInterface
+class UsersFixture extends Fixture
 {
-    use FixtureGroupTrait;
-
-    private const GROUP = [
-        FixturesGroupType::DEV
-    ];
-
     public const USER = 'user';
 
     public function __construct(

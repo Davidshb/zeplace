@@ -15,12 +15,20 @@ export class TokenService {
 
   public getToken(): string|null {
     const token = this._sessionStorageService.get(this._tokenKey)
+    if (token !== null && !this._checkTokenExpired(token)) {
+      return token
+    }
 
-    return token && !this._checkTokenExpired(token) ? token : null
+    return null
   }
 
   public saveToken(token: string) {
     this._sessionStorageService.save(this._tokenKey, token)
+  }
+
+  public cleanToken(): void
+  {
+    this._sessionStorageService.remove(this._tokenKey)
   }
 
   private _parseToken(token: string) {

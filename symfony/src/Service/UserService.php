@@ -8,13 +8,5 @@ use App\Repository\UserRepository;
 
 readonly class UserService
 {
-    public function __construct(
-        private UserRepository $userRepository
-    ) {
-    }
 
-    public function getUserFromLogin(LoginDTO $loginDTO): ?User
-    {
-        return $this->userRepository->findOneBy(['username' => $loginDTO->username]);
-    }
 }

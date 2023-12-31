@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class LoginDTO
 {
+    #[OA\Property(example: 'davidshbo', nullable: false)]
     #[Assert\NotBlank(message: "le nom d'utilisateur est requis", payload: ApiErrorCode::LOGIN_USERNAME_INVALID)]
     #[Assert\Length(
         min: 5,
@@ -16,7 +17,6 @@ class LoginDTO
         maxMessage: "le nom d'utilisateur doit faire maximum 255 caractères",
         payload: ApiErrorCode::LOGIN_USERNAME_INVALID
     )]
-    #[OA\Property(example: 'davidshbo', nullable: false)]
     public ?string $username = null;
 
     #[OA\Property(example: '********', nullable: false)]

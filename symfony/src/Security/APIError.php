@@ -7,14 +7,19 @@ use OpenApi\Attributes as OA;
 
 class APIError
 {
-
     #[OA\Property(
         type: 'string',
         example: 'ERROR_CODE'
     )]
     private ApiErrorCode $errorCode;
 
-    private ?string $errorMessage = null;
+    public function __construct(
+        ApiErrorCode $errorCode,
+        private ?string $errorMessage = null
+    ) {
+        $this->errorCode = $errorCode;
+    }
+
 
     /**
      * @return ApiErrorCode

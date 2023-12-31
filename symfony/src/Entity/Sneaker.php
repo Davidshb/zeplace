@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Entity\Traits\UpdateTrait;
 use App\Repository\SneakerRepository;
 use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -18,55 +19,64 @@ class Sneaker
     use UpdateTrait;
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(length: 255)]
+    private string $uuid;
 
-    #[ORM\Column(unique: true)]
+    #[ORM\Column(length: 100)]
     private string $sku;
 
-    #[ORM\Column]
+    #[ORM\Column(length: 255)]
     private string $title;
 
-    #[ORM\Column]
+    #[ORM\Column(length: 255)]
     private string $colorisCode;
 
-    #[ORM\Column]
+    #[ORM\Column(length: 255)]
     private string $colorisName;
 
     #[ORM\Column(type: Types::TEXT)]
     private string $description;
 
-    #[ORM\Column(type: Types::INTEGER)]
-    private int $retailPrice;
+    #[ORM\Column(type: Types::FLOAT)]
+    private float $retailPrice;
 
-    #[ORM\Column]
+    #[ORM\Column(length: 255)]
     private string $stockXLink;
+
+    #[ORM\Column(type: Types::TEXT)]
+    private string $imgUrl;
+
+    #[ORM\Column(type: Types::TEXT)]
+    private string $thumbnailUrl;
 
     /** @var Collection<int, UserSneaker> */
     #[ORM\OneToMany(mappedBy: 'sneaker', targetEntity: UserSneaker::class, orphanRemoval: true)]
     private Collection $userSneakers;
 
-    #[ORM\ManyToOne(targetEntity: Brand::class, cascade: ['persist'], inversedBy: 'sneakers')]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?Brand $brand;
+    #[ORM\Column(length: 100)]
+    private string $brand;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private DateTimeImmutable $dropDate;
 
-    public function __construct()
+    public function __construct(string $uuid)
     {
+        $this->uuid = $uuid;
         $this->userSneakers = new ArrayCollection();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getSku(): string
     {
         return $this->sku;
+    }
+
+    /**
+     * @param string $sku
+     */
+    public function setSku(string $sku): Sneaker
+    {
+        $this->sku = $sku;
+        return $this;
     }
 
     /**
@@ -141,19 +151,12 @@ class Sneaker
         return $this;
     }
 
-    public function setSku(string $sku): self
-    {
-        $this->sku = $sku;
-
-        return $this;
-    }
-
-    public function getRetailPrice(): int
+    public function getRetailPrice(): float
     {
         return $this->retailPrice;
     }
 
-    public function setRetailPrice(int $retailPrice): self
+    public function setRetailPrice(float $retailPrice): self
     {
         $this->retailPrice = $retailPrice;
 
@@ -184,7 +187,6 @@ class Sneaker
     {
         if (!$this->userSneakers->contains($userSneaker)) {
             $this->userSneakers->add($userSneaker);
-            $userSneaker->setSneaker($this);
         }
 
         return $this;
@@ -192,32 +194,25 @@ class Sneaker
 
     public function removeUserSneaker(UserSneaker $userSneaker): self
     {
-        if ($this->userSneakers->removeElement($userSneaker)) {
-            // set the owning side to null (unless already changed)
-            if ($userSneaker->getSneaker() === $this) {
-                $userSneaker->setSneaker(null);
-            }
-        }
+        $this->userSneakers->removeElement($userSneaker);
 
         return $this;
     }
 
     /**
-     * @return ?Brand
+     * @return string
      */
-    public function getBrand(): ?Brand
+    public function getBrand(): string
     {
         return $this->brand;
     }
 
     /**
-     * @param Brand|null $brand
-     * @return Sneaker
+     * @param string $brand
      */
-    public function setBrand(?Brand $brand): Sneaker
+    public function setBrand(string $brand): void
     {
         $this->brand = $brand;
-        return $this;
     }
 
     public function getDropDate(): DateTimeImmutable
@@ -225,10 +220,44 @@ class Sneaker
         return $this->dropDate;
     }
 
-    public function setDropDate(DateTimeImmutable $dropDate): self
+    public function setDropDate(DateTimeInterface $dropDate): self
     {
-        $this->dropDate = $dropDate;
+        $this->dropDate = DateTimeImmutable::createFromInterface($dropDate);
 
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImgUrl(): string
+    {
+        return $this->imgUrl;
+    }
+
+    /**
+     * @param string $imgUrl
+     * @return Sneaker
+     */
+    public function setImgUrl(string $imgUrl): Sneaker
+    {
+        $this->imgUrl = $imgUrl;
+        return $this;
+    }
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    public function getThumbnailUrl(): string
+    {
+        return $this->thumbnailUrl;
+    }
+
+    public function setThumbnailUrl(string $thumbnailUrl): Sneaker
+    {
+        $this->thumbnailUrl = $thumbnailUrl;
         return $this;
     }
 }

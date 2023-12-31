@@ -9,20 +9,18 @@ use App\Security\TokenHasher;
 use DateInterval;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Firebase\JWT\JWT;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 readonly class JwtService
 {
-    private string $secret;
-
     public function __construct(
         private EntityManagerInterface $entityManager,
         private TokenHasher $hasher,
         private UserTokenRepository $userTokenRepository,
-        ParameterBagInterface $parameterBag
+        private ParameterBagInterface $parameterBag
     ) {
-        $this->secret = $parameterBag->get('jwt')['secret'];
     }
 
     public function extractTokenFromHeader(string $header): string
@@ -30,10 +28,13 @@ readonly class JwtService
         return substr($header, 7);
     }
 
+    /**
+     * @throws Exception
+     */
     public function generate(User $user): string
     {
         $now = new DateTime();
-        $exp = $now->add(new DateInterval('P1D'));
+        $exp = $now->add(new DateInterval($this->parameterBag->get('token.duration')));
 
         $payload = [
             'iat' => $now->getTimestamp(),
@@ -41,7 +42,7 @@ readonly class JwtService
             'username' => $user->getUsername()
         ];
 
-        $token = JWT::encode($payload, $this->secret, 'HS256');
+        $token = JWT::encode($payload, $this->parameterBag->get('jwt.secret'), 'HS256');
 
         $userToken = new UserToken();
         $userToken->setUser($user);

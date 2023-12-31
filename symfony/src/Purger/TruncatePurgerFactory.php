@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class TruncatePurgerFactory implements PurgerFactory
 {
-
     /**
      * @inheritDoc
      */
@@ -17,8 +16,7 @@ class TruncatePurgerFactory implements PurgerFactory
         EntityManagerInterface $em,
         array $excluded = [],
         bool $purgeWithTruncate = false
-    ): PurgerInterface
-    {
+    ): PurgerInterface {
         return new TruncatePurger($em);
     }
 }

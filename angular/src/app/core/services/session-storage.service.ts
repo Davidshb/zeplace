@@ -8,7 +8,11 @@ export class SessionStorageService {
     sessionStorage.setItem(key, value)
   }
 
-  public get(key: string) {
+  public get(key: string): string|null {
     return sessionStorage.getItem(key)
+  }
+
+  public remove(key: string) {
+    sessionStorage.removeItem(key)
   }
 }

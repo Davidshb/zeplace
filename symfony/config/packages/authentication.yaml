@@ -1,3 +1,0 @@
-parameters:
-  jwt:
-    secret: '%env(resolve:JWT_SECRET)%'
